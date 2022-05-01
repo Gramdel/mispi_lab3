@@ -1,0 +1,84 @@
+<project name="mispi_lab3" default="build">
+
+    <property name="src.dir" value="./src/main"/>
+    <property name="target.dir" value="./target"/>
+    <property name="lib.dir" value="./lib"/>
+    <property name="test.dir" value="./src/test"/>
+    <property name="artifact.name" value="./target/mispi_lab3.war"/>
+    <property name="success.music.path" value="./music/success.wav"/>
+    <property name="fail.music.path" value="./music/fail.wav"/>
+
+    <taskdef resource="net/sf/antcontrib/antlib.xml">
+        <classpath>
+            <pathelement location="${lib.dir}/ant-contrib-1.0b3.jar"/>
+        </classpath>
+    </taskdef>
+
+    <path id="dependencies">
+        <fileset dir="${lib.dir}">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="clean">
+        <echo>Cleaning...</echo>
+        <delete dir="${target.dir}"/>
+        <echo>Cleaning finished.</echo>
+    </target>
+
+    <target name="music">
+        <echo>Configuring build music...</echo>
+        <sound>
+            <success source="${success.music.path}"/>
+            <fail source="${fail.music.path}"/>
+        </sound>
+    </target>
+
+    <target name="compile" depends="clean">
+        <echo>Compiling...</echo>
+        <mkdir dir="${target.dir}/classes"/>
+        <javac srcdir="${src.dir}/java" destdir="${target.dir}/classes" includeantruntime="false" encoding="UTF-8">
+            <classpath refid="dependencies"/>
+        </javac>
+        <copy todir="${target.dir}/classes">
+            <fileset dir="${src.dir}/resources"/>
+        </copy>
+        <echo>Compiling finished.</echo>
+    </target>
+
+    <target name="build" depends="music, compile">
+        <echo>Building...</echo>
+        <delete file="${artifact.name}"/>
+        <war destfile = "${artifact.name}" webxml = "${src.dir}/webapp/WEB-INF/web.xml">
+            <fileset dir = "${src.dir}/webapp/">
+                <include name = "**/*.*"/>
+            </fileset>
+            <lib dir = "${lib.dir}"/>
+            <classes dir = "${target.dir}/classes"/>
+        </war>
+        <echo>Building finished.</echo>
+    </target>
+
+    <target name="test" depends="build">
+        <mkdir dir="${target.dir}/tests"/>
+        <javac srcdir="${test.dir}/java" destdir="${target.dir}/tests" includeantruntime="false">
+            <classpath>
+                <path refid="dependencies"/>
+                <pathelement location="${target.dir}/classes"/>
+            </classpath>
+        </javac>
+
+        <mkdir dir="reports"/>
+        <junit fork="true" printsummary="on">
+            <formatter type="xml"/>
+            <classpath>
+                <pathelement location="${target.dir}/classes"/>
+                <pathelement location="${target.dir}/tests"/>
+            </classpath>
+            <batchtest todir="reports">
+                <fileset dir="${test.dir}/java" includes="*Test*.java"/>
+            </batchtest>
+        </junit>
+    </target>
+
+</project>
