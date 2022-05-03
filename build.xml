@@ -1,12 +1,5 @@
 <project name="mispi_lab3" default="build">
-
-    <property name="src.dir" value="./src/main"/>
-    <property name="target.dir" value="./target"/>
-    <property name="lib.dir" value="./lib"/>
-    <property name="test.dir" value="./src/test"/>
-    <property name="artifact.name" value="./target/mispi_lab3.war"/>
-    <property name="success.music.path" value="./music/success.wav"/>
-    <property name="fail.music.path" value="./music/fail.wav"/>
+    <property file="build.properties"/>
 
     <taskdef resource="net/sf/antcontrib/antlib.xml">
         <classpath>
@@ -20,20 +13,6 @@
         </fileset>
     </path>
 
-    <target name="clean">
-        <echo>Cleaning...</echo>
-        <delete dir="${target.dir}"/>
-        <echo>Cleaning finished.</echo>
-    </target>
-
-    <target name="music">
-        <echo>Configuring build music...</echo>
-        <sound>
-            <success source="${success.music.path}"/>
-            <fail source="${fail.music.path}"/>
-        </sound>
-    </target>
-
     <target name="compile" depends="clean">
         <echo>Compiling...</echo>
         <mkdir dir="${target.dir}/classes"/>
@@ -46,17 +25,23 @@
         <echo>Compiling finished.</echo>
     </target>
 
-    <target name="build" depends="music, compile">
+    <target name="build" depends="compile">
         <echo>Building...</echo>
         <delete file="${artifact.name}"/>
-        <war destfile = "${artifact.name}" webxml = "${src.dir}/webapp/WEB-INF/web.xml">
-            <fileset dir = "${src.dir}/webapp/">
-                <include name = "**/*.*"/>
+        <war destfile="${artifact.name}" webxml="${src.dir}/webapp/WEB-INF/web.xml">
+            <fileset dir="${src.dir}/webapp/">
+                <include name="**/*.*"/>
             </fileset>
-            <lib dir = "${lib.dir}"/>
-            <classes dir = "${target.dir}/classes"/>
+            <lib dir="${lib.dir}"/>
+            <classes dir="${target.dir}/classes"/>
         </war>
         <echo>Building finished.</echo>
+    </target>
+
+    <target name="clean">
+        <echo>Cleaning...</echo>
+        <delete dir="${target.dir}"/>
+        <echo>Cleaning finished.</echo>
     </target>
 
     <target name="test" depends="build">
@@ -79,6 +64,38 @@
                 <fileset dir="${test.dir}/java" includes="*Test*.java"/>
             </batchtest>
         </junit>
+    </target>
+
+    <target name="music">
+        <echo>Configuring build music...</echo>
+        <sound>
+            <success source="${success.music.path}"/>
+            <fail source="${fail.music.path}"/>
+        </sound>
+        <antcall target="build"/>
+    </target>
+
+    <target name="env" depends="clean">
+        <echo>Compiling with custom env...</echo>
+        <mkdir dir="${target.dir}/classes"/>
+        <javac srcdir="${src.dir}/java" destdir="${target.dir}/classes" includeantruntime="false">
+            <classpath refid="dependencies"/>
+            <compilerarg line="${arg.line}"/>
+        </javac>
+        <copy todir="${target.dir}/classes">
+            <fileset dir="${src.dir}/resources"/>
+        </copy>
+        <echo>Compiling with custom env finished.</echo>
+        <echo>Building...</echo>
+        <delete file="${artifact.name}"/>
+        <war destfile="${artifact.name}" webxml="${src.dir}/webapp/WEB-INF/web.xml">
+            <fileset dir="${src.dir}/webapp/">
+                <include name="**/*.*"/>
+            </fileset>
+            <lib dir="${lib.dir}"/>
+            <classes dir="${target.dir}/classes"/>
+        </war>
+        <echo>Building finished.</echo>
     </target>
 
 </project>
