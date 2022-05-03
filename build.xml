@@ -45,23 +45,31 @@
     </target>
 
     <target name="test" depends="build">
-        <mkdir dir="${target.dir}/tests"/>
-        <javac srcdir="${test.dir}/java" destdir="${target.dir}/tests" includeantruntime="false">
+        <path id="test.dependencies">
+            <fileset dir="${test.lib.dir}">
+                <include name="*.jar"/>
+            </fileset>
+        </path>
+        <mkdir dir="${target.dir}/test-classes"/>
+        <javac srcdir="${test.src.dir}/java" destdir="${target.dir}/test-classes" includeantruntime="false">
             <classpath>
                 <path refid="dependencies"/>
+                <path refid="test.dependencies"/>
                 <pathelement location="${target.dir}/classes"/>
             </classpath>
         </javac>
-
-        <mkdir dir="reports"/>
-        <junit fork="true" printsummary="on">
-            <formatter type="xml"/>
+        <junit printsummary="on" haltonfailure="yes" fork="true">
             <classpath>
+                <path refid="dependencies"/>
+                <path refid="test.dependencies"/>
                 <pathelement location="${target.dir}/classes"/>
-                <pathelement location="${target.dir}/tests"/>
+                <pathelement location="${target.dir}/test-classes"/>
             </classpath>
-            <batchtest todir="reports">
-                <fileset dir="${test.dir}/java" includes="*Test*.java"/>
+            <formatter type="brief" usefile="false"/>
+            <batchtest>
+                <fileset dir="${test.src.dir}/java">
+                    <include name="*Test*.java"/>
+                </fileset>
             </batchtest>
         </junit>
     </target>
