@@ -51,8 +51,8 @@ public class WebTest {
         setTextField("pointCheckForm:xField", "0.5");
         setTextField("pointCheckForm:yField", "0.5");
         clickButton("pointCheckForm:commandButton");
-        setTextField("pointCheckForm:xField", "1");
-        setTextField("pointCheckForm:yField", "1");
+        setTextField("pointCheckForm:xField", "3");
+        setTextField("pointCheckForm:yField", "3");
         clickButton("pointCheckForm:commandButton");
 
         DBUnit dbUnit = new DBUnit();
@@ -60,12 +60,12 @@ public class WebTest {
 
         Assert.assertEquals(0.5, list.get(list.size()-2).getX(), 0);
         Assert.assertEquals(0.5, list.get(list.size()-2).getY(), 0);
-        Assert.assertEquals(2, list.get(list.size()-2).getR(), 0);
+        Assert.assertEquals(3, list.get(list.size()-2).getR(), 0);
         Assert.assertTrue(list.get(list.size() - 2).isInArea());
 
-        Assert.assertEquals(1, list.get(list.size()-1).getX(), 0);
-        Assert.assertEquals(1, list.get(list.size()-1).getY(), 0);
-        Assert.assertEquals(2, list.get(list.size()-1).getR(), 0);
+        Assert.assertEquals(3, list.get(list.size()-1).getX(), 0);
+        Assert.assertEquals(3, list.get(list.size()-1).getY(), 0);
+        Assert.assertEquals(3, list.get(list.size()-1).getR(), 0);
         Assert.assertFalse(list.get(list.size() - 1).isInArea());
     }
 }
